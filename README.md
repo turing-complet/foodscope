@@ -6,3 +6,4 @@ https://foodb.ca/compounds/FDB003717#references
 ## TODO
 - Bin foods by nutrient (quartiles)
 - get health effects of a given meal
+- preprocess data to minimize file size, or import to postgres?
