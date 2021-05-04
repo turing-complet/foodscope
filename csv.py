@@ -3,6 +3,7 @@ import pandas as pd
 
 def get_nutrients():
     df = pd.read_csv("foodb_2020_04_07_csv/Nutrient.csv", usecols=["id", "name"])
+    df.rename(columns={"id": "nutrient_id"}, inplace=True)
     return df
 
 
@@ -66,16 +67,19 @@ def composition(food: str, source=None):
     if source is None:
         source = ("Compound", "Nutrient")
     food = select_food(food)
-    df = get_content(
-        cols=["source_id", "source_type", "food_id"],
-    )
+    df = get_content(cols=["source_id", "source_type", "food_id"])
     df = pd.merge(df, food, on="food_id")
+    result = pd.DataFrame()
     if "Compound" in source:
         compound = get_compounds()
-        df = pd.merge(df, compound, left_on="source_id", right_on="compound_id")
+        result = result.append(
+            pd.merge(df[df.source_type == "Compound"], compound, left_on="source_id", right_on="compound_id")
+        )
     if "Nutrient" in source:
         nutrient = get_nutrients()
-        df = pd.merge(df, nutrient, left_on="source_id", right_on="id")
+        result.append(
+            pd.merge(df[df.source_type == "Nutrient"], nutrient, left_on="source_id", right_on="nutrient_id")
+        )
     return df
 
 
