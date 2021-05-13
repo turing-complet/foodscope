@@ -5,14 +5,18 @@ import pandas as pd
 _csv_dir = Path(Path(__file__).parent.parent, "foodb_2020_04_07_csv")
 
 
+def load(filename, cols):
+    return pd.read_csv(f"{_csv_dir}/{filename}", usecols=cols)
+
+
 def get_nutrients():
-    df = pd.read_csv(f"{_csv_dir}/Nutrient.csv", usecols=["id", "name"])
+    df = load("Nutrient.csv", cols=["id", "name"])
     df.rename(columns={"id": "nutrient_id"}, inplace=True)
     return df
 
 
 def get_compounds():
-    df = pd.read_csv(f"{_csv_dir}/Compound.csv", usecols=["id", "name"])
+    df = load("Compound.csv", cols=["id", "name"])
     df.rename(columns={"id": "compound_id"}, inplace=True)
     return df
 
@@ -23,7 +27,7 @@ def select_compound(name: str):
 
 
 def get_foods():
-    foods = pd.read_csv(f"{_csv_dir}/Food.csv", usecols=["id", "name"])
+    foods = load("Food.csv", cols=["id", "name"])
     foods.rename(columns={"id": "food_id"}, inplace=True)
     return foods
 
@@ -34,16 +38,13 @@ def select_food(food: str):
 
 
 def get_health_effects():
-    df = pd.read_csv(
-        f"{_csv_dir}/HealthEffect.csv", usecols=["id", "name", "description"]
-    )
+    df = load("HealthEffect.csv", cols=["id", "name", "description"])
     return df
 
 
 def get_compounds_health_effects():
-    df = pd.read_csv(
-        f"{_csv_dir}/CompoundsHealthEffect.csv",
-        usecols=["id", "compound_id", "health_effect_id"],
+    df = load(
+        "CompoundsHealthEffect.csv", cols=["id", "compound_id", "health_effect_id"]
     )
     return df
 
@@ -62,7 +63,7 @@ def get_content(cols=None):
             "orig_max",
         ]
     )
-    df = pd.read_csv(f"{_csv_dir}/Content.csv", usecols=cols)
+    df = load("Content.csv", cols=cols)
     return df
 
 
