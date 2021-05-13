@@ -10,4 +10,4 @@ https://foodb.ca/compounds/FDB003717#references
 - cache base data frames in memory
 - backup dataset
 - unit test with df.head() as mock
-- is nvim.telescope loading all files into memory?
+- compounds contain greek β AND regular "beta"

@@ -7,6 +7,7 @@ from foodscope.csv import (
     get_foods,
     get_health_effects,
     get_nutrients,
+    health_effects,
     select_compound,
     select_food,
 )

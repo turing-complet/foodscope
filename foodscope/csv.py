@@ -33,6 +33,21 @@ def select_food(food: str):
     return foods.loc[foods.name.str.contains(food, case=False), :]
 
 
+def get_health_effects():
+    df = pd.read_csv(
+        f"{_csv_dir}/HealthEffect.csv", usecols=["id", "name", "description"]
+    )
+    return df
+
+
+def get_compounds_health_effects():
+    df = pd.read_csv(
+        f"{_csv_dir}/CompoundsHealthEffect.csv",
+        usecols=["id", "compound_id", "health_effect_id"],
+    )
+    return df
+
+
 def get_content(cols=None):
     cols = (
         cols
@@ -97,5 +112,6 @@ def composition(food: str, source=None):
     return df
 
 
-def get_health_effects(food: str):
+def health_effects(food: str):
+    # join CompoundsHealthEffect.csv with HealthEffect.csv and Food.csv
     pass
