@@ -1,14 +1,18 @@
+from pathlib import Path
+
 import pandas as pd
+
+_csv_dir = Path(Path(__file__).parent.parent, "foodb_2020_04_07_csv")
 
 
 def get_nutrients():
-    df = pd.read_csv("foodb_2020_04_07_csv/Nutrient.csv", usecols=["id", "name"])
+    df = pd.read_csv(f"{_csv_dir}/Nutrient.csv", usecols=["id", "name"])
     df.rename(columns={"id": "nutrient_id"}, inplace=True)
     return df
 
 
 def get_compounds():
-    df = pd.read_csv("foodb_2020_04_07_csv/Compound.csv", usecols=["id", "name"])
+    df = pd.read_csv(f"{_csv_dir}/Compound.csv", usecols=["id", "name"])
     df.rename(columns={"id": "compound_id"}, inplace=True)
     return df
 
@@ -19,7 +23,7 @@ def select_compound(name: str):
 
 
 def get_foods():
-    foods = pd.read_csv("foodb_2020_04_07_csv/Food.csv", usecols=["id", "name"])
+    foods = pd.read_csv(f"{_csv_dir}/Food.csv", usecols=["id", "name"])
     foods.rename(columns={"id": "food_id"}, inplace=True)
     return foods
 
@@ -43,7 +47,7 @@ def get_content(cols=None):
             "orig_max",
         ]
     )
-    df = pd.read_csv("foodb_2020_04_07_csv/Content.csv", usecols=cols)
+    df = pd.read_csv(f"{_csv_dir}/Content.csv", usecols=cols)
     return df
 
 
@@ -73,12 +77,22 @@ def composition(food: str, source=None):
     if "Compound" in source:
         compound = get_compounds()
         result = result.append(
-            pd.merge(df[df.source_type == "Compound"], compound, left_on="source_id", right_on="compound_id")
+            pd.merge(
+                df[df.source_type == "Compound"],
+                compound,
+                left_on="source_id",
+                right_on="compound_id",
+            )
         )
     if "Nutrient" in source:
         nutrient = get_nutrients()
         result.append(
-            pd.merge(df[df.source_type == "Nutrient"], nutrient, left_on="source_id", right_on="nutrient_id")
+            pd.merge(
+                df[df.source_type == "Nutrient"],
+                nutrient,
+                left_on="source_id",
+                right_on="nutrient_id",
+            )
         )
     return df
 
