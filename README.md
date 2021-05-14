@@ -28,3 +28,4 @@ https://foodb.ca/compounds/FDB003717#references
 - backup dataset
 - unit test with df.head() as mock
 - compounds contain greek β AND regular "beta"
+- fuzzy vs exact match

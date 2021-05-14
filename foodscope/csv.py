@@ -110,7 +110,7 @@ def composition(food: str, source=None):
         )
     if "Nutrient" in source:
         nutrient = get_nutrients()
-        result.append(
+        result = result.append(
             pd.merge(
                 filter_content(df, "Nutrient"),
                 nutrient,
@@ -118,7 +118,7 @@ def composition(food: str, source=None):
                 right_on="nutrient_id",
             )
         )
-    return df
+    return result
 
 
 def health_effects(food: str):
