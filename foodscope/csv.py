@@ -39,6 +39,7 @@ def select_food(food: str):
 
 def get_health_effects():
     df = load("HealthEffect.csv", cols=["id", "name", "description"])
+    df.rename(columns={"id": "health_effect_id"}, inplace=True)
     return df
 
 
@@ -67,12 +68,19 @@ def get_content(cols=None):
     return df
 
 
+def filter_content(df=None, source_type=None, cols=None):
+    df = get_content(cols) if df is None else df
+    if source_type not in ("Nutrient", "Compound"):
+        raise ValueError(f"Invalid source_type={source_type}")
+    return df.loc[df.source_type == source_type, :]
+
+
 def foods_by_compound(compound: str):
     compounds = select_compound(compound)
     ids = compounds.compound_id
 
-    df = get_content()
-    mask = df["source_id"].isin(ids) & (df["source_type"] == "Compound")
+    df = filter_content(source_type="Compound")
+    mask = df["source_id"].isin(ids)
     df = df.loc[mask, :]
     df.rename(columns={"source_id": "compound_id"}, inplace=True)
 
@@ -94,7 +102,7 @@ def composition(food: str, source=None):
         compound = get_compounds()
         result = result.append(
             pd.merge(
-                df[df.source_type == "Compound"],
+                filter_content(df, "Compound"),
                 compound,
                 left_on="source_id",
                 right_on="compound_id",
@@ -104,7 +112,7 @@ def composition(food: str, source=None):
         nutrient = get_nutrients()
         result.append(
             pd.merge(
-                df[df.source_type == "Nutrient"],
+                filter_content(df, "Nutrient"),
                 nutrient,
                 left_on="source_id",
                 right_on="nutrient_id",
@@ -114,5 +122,10 @@ def composition(food: str, source=None):
 
 
 def health_effects(food: str):
-    # join CompoundsHealthEffect.csv with HealthEffect.csv and Food.csv
-    pass
+    df = filter_content(source_type="Compound")
+    result = pd.merge(select_food(food), df, on="food_id")
+    result = pd.merge(
+        result, get_compounds(), left_on="source_id", right_on="compound_id"
+    )
+    result = pd.merge(result, get_compounds_health_effects(), on="compound_id")
+    return pd.merge(result, get_health_effects(), on="health_effect_id")

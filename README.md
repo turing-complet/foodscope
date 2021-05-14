@@ -14,6 +14,7 @@ import foodscope as fs
 fs.get_nutrients()
 fs.foods_by_compound("sulf")
 fs.composition("apple")
+fs.health_effects("artichoke")
 ```
 
 https://foodb.ca/compounds/FDB003717#references
