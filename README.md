@@ -6,12 +6,14 @@ curl https://foodb.ca/public/system/downloads/foodb_2020_4_7_csv.tar.gz -O
 tar xf foodb_2020_4_7_csv.tar.gz
 ```
 
-Usage
+Usage (see [demo](foodscope/demo.py))
 
 ```python
 import foodscope as fs
 
 fs.get_nutrients()
+fs.select_food("chicken")
+fs.filter_content(source_type="Nutrient")
 fs.foods_by_compound("sulf")
 fs.composition("apple")
 fs.health_effects("artichoke")
