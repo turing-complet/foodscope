@@ -6,49 +6,64 @@ import pandas as pd
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
+class Table(pd.DataFrame):
+    _filename = None
+    _cols = None
+    _rename = None
+
+    def __new__(cls, cols=None):
+        cols = cols if cols is not None else cls._cols
+        df = pd.read_csv(Path(_csv_dir, cls._filename), usecols=cols)
+        if cls._rename is not None:
+            df.rename(columns=cls._rename, inplace=True)
+        return df
+
+
+class Nutrient(Table):
+    _filename = "Nutrient.csv"
+    _cols = ["id", "name"]
+    _rename = {"id": "nutrient_id"}
+
+
+class Compound(Table):
+    _filename = "Compound.csv"
+    _cols = ["id", "name"]
+    _rename = {"id": "compound_id"}
+
+
+class Food(Table):
+    _filename = "Food.csv"
+    _cols = ["id", "name"]
+    _rename = {"id": "food_id"}
+
+
+class CompoundsHealthEffect(Table):
+    _filename = "CompoundsHealthEffect.csv"
+    _cols = ["id", "compound_id", "health_effect_id"]
+
+
+class HealthEffect(Table):
+    _filename = "HealthEffect.csv"
+    _cols = ["id", "name", "description"]
+    _rename = {"id": "health_effect_id"}
+
+
+class Content(Table):
+    _filename = "Content.csv"
+
+
 def load(filename, cols=None):
     return pd.read_csv(Path(_csv_dir, filename), usecols=cols)
 
 
-def get_nutrients():
-    df = load("Nutrient.csv", cols=["id", "name"])
-    df.rename(columns={"id": "nutrient_id"}, inplace=True)
-    return df
-
-
-def get_compounds():
-    df = load("Compound.csv", cols=["id", "name"])
-    df.rename(columns={"id": "compound_id"}, inplace=True)
-    return df
-
-
 def select_compound(name: str):
-    df = get_compounds()
+    df = Compound()
     return df.loc[df.name.str.contains(name, case=False), :]
 
 
-def get_foods():
-    foods = load("Food.csv", cols=["id", "name"])
-    foods.rename(columns={"id": "food_id"}, inplace=True)
-    return foods
-
-
 def select_food(food: str):
-    foods = get_foods()
+    foods = Food()
     return foods.loc[foods.name.str.contains(food, case=False), :]
-
-
-def get_health_effects():
-    df = load("HealthEffect.csv", cols=["id", "name", "description"])
-    df.rename(columns={"id": "health_effect_id"}, inplace=True)
-    return df
-
-
-def get_compounds_health_effects():
-    df = load(
-        "CompoundsHealthEffect.csv", cols=["id", "compound_id", "health_effect_id"]
-    )
-    return df
 
 
 def get_content(cols=None):
@@ -85,7 +100,7 @@ def foods_by_compound(compound: str):
     df = df.loc[mask, :]
     df.rename(columns={"source_id": "compound_id"}, inplace=True)
 
-    foods = get_foods()
+    foods = Food()
     merged = pd.merge(df, foods, on="food_id")
     merged.rename(columns={"source_id": "compound_id"}, inplace=True)
     return pd.merge(merged, compounds, on="compound_id")
@@ -100,7 +115,7 @@ def composition(food: str, source=None):
     df = pd.merge(df, food, on="food_id")
     result = pd.DataFrame()
     if "Compound" in source:
-        compound = get_compounds()
+        compound = Compound()
         result = result.append(
             pd.merge(
                 filter_content(df, "Compound"),
@@ -110,7 +125,7 @@ def composition(food: str, source=None):
             )
         )
     if "Nutrient" in source:
-        nutrient = get_nutrients()
+        nutrient = Nutrient()
         result = result.append(
             pd.merge(
                 filter_content(df, "Nutrient"),
@@ -125,8 +140,6 @@ def composition(food: str, source=None):
 def health_effects(food: str):
     df = filter_content(source_type="Compound")
     result = pd.merge(select_food(food), df, on="food_id")
-    result = pd.merge(
-        result, get_compounds(), left_on="source_id", right_on="compound_id"
-    )
-    result = pd.merge(result, get_compounds_health_effects(), on="compound_id")
-    return pd.merge(result, get_health_effects(), on="health_effect_id")
+    result = pd.merge(result, Compound(), left_on="source_id", right_on="compound_id")
+    result = pd.merge(result, CompoundsHealthEffect(), on="compound_id")
+    return pd.merge(result, HealthEffect(), on="health_effect_id")
