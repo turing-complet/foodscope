@@ -5,6 +5,9 @@ nutrient = fs.Nutrient()
 food = fs.Food()
 compound = fs.Compound()
 
+# unfiltered
+nutrient = fs.Nutrient(cols="all")
+
 # simple filters
 fs.select_food("chicken")
 fs.filter_content(source_type="Nutrient")

@@ -14,9 +14,11 @@ Usage (see [demo](foodscope/demo.py))
 import foodscope as fs
 
 # base data frames
-nutrient = fs.Nutrient()
 food = fs.Food()
 compound = fs.Compound()
+
+# unfiltered
+nutrient = fs.Nutrient(cols="all")
 
 #simple filters
 fs.select_food("chicken")

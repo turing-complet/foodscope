@@ -6,14 +6,17 @@ import pandas as pd
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
-class Table(pd.DataFrame):
+class Table:
     _filename = None
     _cols = None
     _rename = None
 
     def __new__(cls, cols=None):
-        cols = cols if cols is not None else cls._cols
-        df = pd.read_csv(Path(_csv_dir, cls._filename), usecols=cols)
+        if cols is None:
+            cols = cls._cols
+        elif cols == "all":
+            cols = None
+        df = load(cls._filename, cols)
         if cls._rename is not None:
             df.rename(columns=cls._rename, inplace=True)
         return df
