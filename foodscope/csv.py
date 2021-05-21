@@ -3,11 +3,11 @@ from pathlib import Path
 import pandas as pd
 
 # pd.set_option("display.max_rows", None)
-_csv_dir = Path(Path(__file__).parent.parent, "foodb_2020_04_07_csv")
+_csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
 def load(filename, cols=None):
-    return pd.read_csv(f"{_csv_dir}/{filename}", usecols=cols)
+    return pd.read_csv(Path(_csv_dir, filename), usecols=cols)
 
 
 def get_nutrients():

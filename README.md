@@ -1,5 +1,7 @@
 # foodscope
 
+A closer look at food, based on data from [foodb](https://foodb.ca/)
+
 Download the database
 ```
 curl https://foodb.ca/public/system/downloads/foodb_2020_4_7_csv.tar.gz -O
@@ -32,3 +34,4 @@ https://foodb.ca/compounds/FDB003717#references
 - compounds contain greek β AND regular "beta"
 - fuzzy vs exact match
 - gzip csv and store in s3/blob
+- ask foodb about nan cols
