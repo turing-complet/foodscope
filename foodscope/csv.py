@@ -2,10 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 
+# pd.set_option("display.max_rows", None)
 _csv_dir = Path(Path(__file__).parent.parent, "foodb_2020_04_07_csv")
 
 
-def load(filename, cols):
+def load(filename, cols=None):
     return pd.read_csv(f"{_csv_dir}/{filename}", usecols=cols)
 
 
