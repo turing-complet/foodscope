@@ -21,7 +21,8 @@ compound = fs.Compound()
 nutrient = fs.Nutrient(cols="all")
 
 #simple filters
-fs.select_food("chicken")
+food.select("chicken")
+nutrient.select("protein")
 fs.filter_content(source_type="Nutrient")
 
 # fancy stuff

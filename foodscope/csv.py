@@ -6,20 +6,23 @@ import pandas as pd
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
-class Table:
+class Table(pd.DataFrame):
     _filename = None
     _cols = None
     _rename = None
 
-    def __new__(cls, cols=None):
+    def __init__(self, cols=None):
         if cols is None:
-            cols = cls._cols
+            cols = self._cols
         elif cols == "all":
             cols = None
-        df = load(cls._filename, cols)
-        if cls._rename is not None:
-            df.rename(columns=cls._rename, inplace=True)
-        return df
+        df = load(self._filename, cols)
+        if self._rename is not None:
+            df.rename(columns=self._rename, inplace=True)
+        super().__init__(df)
+
+    def select(self, name):
+        return self.loc[self.name.str.contains(name, case=False), :]
 
 
 class Nutrient(Table):
@@ -53,49 +56,30 @@ class HealthEffect(Table):
 
 class Content(Table):
     _filename = "Content.csv"
+    _cols = [
+        "id",
+        "food_id",
+        "source_id",
+        "source_type",
+        "orig_content",
+        "orig_min",
+        "orig_max",
+    ]
 
 
 def load(filename, cols=None):
     return pd.read_csv(Path(_csv_dir, filename), usecols=cols)
 
 
-def select_compound(name: str):
-    df = Compound()
-    return df.loc[df.name.str.contains(name, case=False), :]
-
-
-def select_food(food: str):
-    foods = Food()
-    return foods.loc[foods.name.str.contains(food, case=False), :]
-
-
-def get_content(cols=None):
-    cols = (
-        cols
-        if cols is not None
-        else [
-            "id",
-            "food_id",
-            "source_id",
-            "source_type",
-            "orig_content",
-            "orig_min",
-            "orig_max",
-        ]
-    )
-    df = load("Content.csv", cols=cols)
-    return df
-
-
 def filter_content(df=None, source_type=None, cols=None):
-    df = get_content(cols) if df is None else df
+    df = Content(cols) if df is None else df
     if source_type not in ("Nutrient", "Compound"):
         raise ValueError(f"Invalid source_type={source_type}")
     return df.loc[df.source_type == source_type, :]
 
 
 def foods_by_compound(compound: str):
-    compounds = select_compound(compound)
+    compounds = Compound().select(compound)
     ids = compounds.compound_id
 
     df = filter_content(source_type="Compound")
@@ -113,8 +97,8 @@ def foods_by_compound(compound: str):
 def composition(food: str, source=None):
     if source is None:
         source = ("Compound", "Nutrient")
-    food = select_food(food)
-    df = get_content(cols=["source_id", "source_type", "food_id"])
+    food = Food().select(food)
+    df = Content(cols=["source_id", "source_type", "food_id"])
     df = pd.merge(df, food, on="food_id")
     result = pd.DataFrame()
     if "Compound" in source:
@@ -142,7 +126,7 @@ def composition(food: str, source=None):
 
 def health_effects(food: str):
     df = filter_content(source_type="Compound")
-    result = pd.merge(select_food(food), df, on="food_id")
+    result = pd.merge(Food().select(food), df, on="food_id")
     result = pd.merge(result, Compound(), left_on="source_id", right_on="compound_id")
     result = pd.merge(result, CompoundsHealthEffect(), on="compound_id")
     return pd.merge(result, HealthEffect(), on="health_effect_id")

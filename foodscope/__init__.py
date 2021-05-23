@@ -9,8 +9,5 @@ from foodscope.csv import (
     composition,
     filter_content,
     foods_by_compound,
-    get_content,
     health_effects,
-    select_compound,
-    select_food,
 )
