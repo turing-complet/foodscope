@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from foodscope.csv import _csv_dir, load
@@ -33,10 +34,14 @@ def get_stats(threshold=10, show_all=False):
 
 def drop_nan():
     for f in files:
-        df = load(f"{f}.csv")
+        fname = f"{f}.csv"
+        new_fname = f"{f}.v1.csv"
+        df = load(fname)
         df2 = df.dropna(axis=1, how="all")
         try:
             df.compare(df2)
             print(f"No change in {f}")
         except ValueError:
-            df2.to_csv(Path(_csv_dir, f"{f}.v1.csv"), index=False)
+            print(f"{fname} -> {new_fname}")
+            shutil.move(Path(_csv_dir, fname), Path(_csv_dir, new_fname))
+            df2.to_csv(Path(_csv_dir, fname), index=False)

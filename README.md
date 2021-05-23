@@ -13,9 +13,19 @@ Usage (see [demo](foodscope/demo.py))
 ```python
 import foodscope as fs
 
-fs.get_nutrients()
-fs.select_food("chicken")
+# base data frames
+food = fs.Food()
+compound = fs.Compound()
+
+# unfiltered
+nutrient = fs.Nutrient(cols="all")
+
+#simple filters
+food.select("chicken")
+nutrient.select("protein")
 fs.filter_content(source_type="Nutrient")
+
+# fancy stuff
 fs.foods_by_compound("sulf")
 fs.composition("apple")
 fs.health_effects("artichoke")
@@ -33,5 +43,6 @@ https://foodb.ca/compounds/FDB003717#references
 - unit test with df.head() as mock
 - compounds contain greek β AND regular "beta"
 - fuzzy vs exact match
-- gzip csv and store in s3/blob
 - ask foodb about nan cols
+- use CompoundSynonym.csv
+- convert to hdf5
