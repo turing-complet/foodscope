@@ -87,9 +87,7 @@ def foods_by_compound(compound: str):
     df = df.loc[mask, :]
     df.rename(columns={"source_id": "compound_id"}, inplace=True)
 
-    foods = Food()
-    merged = pd.merge(df, foods, on="food_id")
-    merged.rename(columns={"source_id": "compound_id"}, inplace=True)
+    merged = pd.merge(df, Food(), on="food_id")
     return pd.merge(merged, compounds, on="compound_id")
 
 
@@ -97,9 +95,9 @@ def foods_by_compound(compound: str):
 def composition(food: str, source=None):
     if source is None:
         source = ("Compound", "Nutrient")
-    food = Food().select(food)
+
     df = Content(cols=["source_id", "source_type", "food_id"])
-    df = pd.merge(df, food, on="food_id")
+    df = pd.merge(df, Food().select(food), on="food_id")
     result = pd.DataFrame()
     if "Compound" in source:
         compound = Compound()
