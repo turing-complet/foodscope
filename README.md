@@ -2,7 +2,8 @@
 
 A closer look at food, based on data from [foodb](https://foodb.ca/)
 
-Download the database
+Download the database (also available
+[here](https://foodscope.blob.core.windows.net/data/foodb_2020_4_7_csv.tar.gz))
 ```
 curl https://foodb.ca/public/system/downloads/foodb_2020_4_7_csv.tar.gz -O
 tar xf foodb_2020_4_7_csv.tar.gz
@@ -39,10 +40,10 @@ https://foodb.ca/compounds/FDB003717#references
 - get health effects of a given meal
 - preprocess data to minimize file size, or import to postgres?
 - cache base data frames in memory
-- backup dataset
 - unit test with df.head() as mock
 - compounds contain greek β AND regular "beta"
 - fuzzy vs exact match
 - ask foodb about nan cols
 - use CompoundSynonym.csv
 - convert to hdf5
+- filter against config file with compounds of interest

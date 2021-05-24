@@ -100,21 +100,19 @@ def composition(food: str, source=None):
     df = pd.merge(df, Food().select(food), on="food_id")
     result = pd.DataFrame()
     if "Compound" in source:
-        compound = Compound()
         result = result.append(
             pd.merge(
                 filter_content(df, "Compound"),
-                compound,
+                Compound(),
                 left_on="source_id",
                 right_on="compound_id",
             )
         )
     if "Nutrient" in source:
-        nutrient = Nutrient()
         result = result.append(
             pd.merge(
                 filter_content(df, "Nutrient"),
-                nutrient,
+                Nutrient(),
                 left_on="source_id",
                 right_on="nutrient_id",
             )
