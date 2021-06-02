@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 
-# pd.set_option("display.max_rows", None)
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
@@ -35,6 +34,14 @@ class Compound(Table):
     _filename = "Compound.csv"
     _cols = ["id", "name"]
     _rename = {"id": "compound_id"}
+
+    def equiv(self, group):
+        return self.loc[self.name.str.contains("|".join(group))]
+
+    def health_effects(self, group):
+        result = self.equiv(group)
+        result = pd.merge(result, CompoundsHealthEffect(), on="compound_id")
+        return pd.merge(result, HealthEffect(), on="health_effect_id")
 
 
 class Food(Table):
