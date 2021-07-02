@@ -17,3 +17,8 @@ fs.filter_content(source_type="Nutrient")
 fs.foods_by_compound("sulf")
 fs.composition("apple")
 fs.health_effects("artichoke")
+
+# compounds
+c = fs.Compound()
+c.equiv(fs.vitamin_a)
+c.health_effects(fs.vitamin_a)
