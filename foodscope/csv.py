@@ -127,6 +127,7 @@ def composition(food: str, source=None):
     return result
 
 
+# reuse the part from Compound
 def health_effects(food: str):
     df = filter_content(source_type="Compound")
     result = pd.merge(Food().select(food), df, on="food_id")

@@ -4,12 +4,13 @@ chardet==4.0.0
 colorama==0.4.4
 decorator==5.0.7
 idna==2.10
-ipython==7.22.0
+ipython==7.25.0
 ipython-genutils==0.2.0
 jedi==0.18.0
+matplotlib-inline==0.1.2
 numexpr==2.7.3
 numpy==1.20.2
-pandas==1.2.4
+pandas==1.2.5
 parso==0.8.2
 pexpect==4.8.0
 pickleshare==0.7.5

@@ -13,7 +13,7 @@ from foodscope.csv import (
     foods_by_compound,
     health_effects,
 )
-from foodscope.mappings import vitamin_a
+from foodscope.mappings import vitamin_a, expand_greeks
 
 # pd.set_option("display.max_rows", None)
 # pd.set_option("display.max_columns", None)

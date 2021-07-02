@@ -47,8 +47,9 @@ https://foodb.ca/compounds/FDB003717#references
 - cache base data frames in memory
 - unit test with df.head() as mock
 - compounds contain greek β AND regular "beta"
-- fuzzy vs exact match
+- fuzzy vs exact match - could use global option?
 - ask foodb about nan cols
 - use CompoundSynonym.csv
 - convert to hdf5
 - filter against config file with compounds of interest
+- allow passing compound_id, food_id, etc
