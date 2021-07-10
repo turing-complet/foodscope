@@ -14,6 +14,14 @@ Usage (see [demo](foodscope/demo.py))
 ```python
 import foodscope as fs
 
+
+# global view
+db = fs.FooDb()
+db.food.select("milk")
+
+# case insensitive match across permutations
+db.compound.equiv(fs.expand_greeks("beta-carotene"))
+
 # base data frames
 food = fs.Food()
 compound = fs.Compound()
@@ -54,6 +62,7 @@ https://foodb.ca/compounds/FDB003717#references
 - ask foodb about nan cols
 - use CompoundSynonym.csv
 - convert to hdf5
+- use pyfilesystem for preprocessing
 - filter against config file with compounds of interest
 - allow passing compound_id, food_id, etc
 

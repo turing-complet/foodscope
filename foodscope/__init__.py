@@ -6,6 +6,7 @@ from foodscope.csv import (
     CompoundsHealthEffect,
     Content,
     Food,
+    FooDb,
     HealthEffect,
     Nutrient,
     composition,

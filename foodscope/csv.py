@@ -5,6 +5,14 @@ import pandas as pd
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
+class FooDb:
+    def __init__(self) -> None:
+        self.food = Food()
+        self.compound = Compound()
+        self.nutrient = Nutrient()
+        self.mapping = None
+
+
 class Table(pd.DataFrame):
     _filename = None
     _cols = None
@@ -21,7 +29,13 @@ class Table(pd.DataFrame):
         super().__init__(df)
 
     def select(self, name):
-        return self.loc[self.name.str.contains(name, case=False), :]
+        return self.equiv([name])
+
+    def equiv(self, group):
+        return self.loc[self.name.str.contains("|".join(group), case=False)]
+
+    def by_id(self, id_col, row_id):
+        return self.loc[self.get(id_col) == row_id, :]
 
 
 class Nutrient(Table):
@@ -34,9 +48,6 @@ class Compound(Table):
     _filename = "Compound.csv"
     _cols = ["id", "name"]
     _rename = {"id": "compound_id"}
-
-    def equiv(self, group):
-        return self.loc[self.name.str.contains("|".join(group))]
 
     def health_effects(self, group):
         result = self.equiv(group)

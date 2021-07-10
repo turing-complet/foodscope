@@ -1,5 +1,12 @@
 import foodscope as fs
 
+# global view
+db = fs.FooDb()
+db.food.select("milk")
+
+# case insensitive match across permutations
+db.compound.equiv(fs.expand_greeks("beta-carotene"))
+
 # base data frames
 nutrient = fs.Nutrient()
 food = fs.Food()
