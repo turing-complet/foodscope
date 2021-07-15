@@ -10,7 +10,15 @@ class FooDb:
         self.food = Food()
         self.compound = Compound()
         self.nutrient = Nutrient()
-        self.mapping = None
+        self.health_effect = HealthEffect()
+        self.compounds_health_effect = CompoundsHealthEffect()
+        self._content = None
+
+    @property
+    def content(self):
+        if self._content is None:
+            self._content = Content()
+        return self._content
 
 
 class Table(pd.DataFrame):
@@ -34,20 +42,24 @@ class Table(pd.DataFrame):
     def equiv(self, group):
         return self.loc[self.name.str.contains("|".join(group), case=False)]
 
-    def by_id(self, id_col, row_id):
-        return self.loc[self.get(id_col) == row_id, :]
+
+class EntityTable(Table):
+    def by_id(self, row_id):
+        return self.loc[self.get(self._id) == row_id, :]
 
 
-class Nutrient(Table):
+class Nutrient(EntityTable):
     _filename = "Nutrient.csv"
     _cols = ["id", "name"]
     _rename = {"id": "nutrient_id"}
+    _id = "nutrient_id"
 
 
-class Compound(Table):
+class Compound(EntityTable):
     _filename = "Compound.csv"
     _cols = ["id", "name"]
     _rename = {"id": "compound_id"}
+    _id = "compound_id"
 
     def health_effects(self, group):
         result = self.equiv(group)
@@ -55,21 +67,23 @@ class Compound(Table):
         return pd.merge(result, HealthEffect(), on="health_effect_id")
 
 
-class Food(Table):
+class Food(EntityTable):
     _filename = "Food.csv"
     _cols = ["id", "name"]
     _rename = {"id": "food_id"}
+    _id = "food_id"
+
+
+class HealthEffect(EntityTable):
+    _filename = "HealthEffect.csv"
+    _cols = ["id", "name", "description"]
+    _rename = {"id": "health_effect_id"}
+    _id = "health_effect_id"
 
 
 class CompoundsHealthEffect(Table):
     _filename = "CompoundsHealthEffect.csv"
     _cols = ["id", "compound_id", "health_effect_id"]
-
-
-class HealthEffect(Table):
-    _filename = "HealthEffect.csv"
-    _cols = ["id", "name", "description"]
-    _rename = {"id": "health_effect_id"}
 
 
 class Content(Table):

@@ -57,20 +57,13 @@ https://foodb.ca/compounds/FDB003717#references
 - preprocess data to minimize file size, or import to postgres?
 - cache base data frames in memory
 - unit test with df.head() as mock
-- compounds contain greek β AND regular "beta"
 - fuzzy vs exact match - could use global option?
 - ask foodb about nan cols
 - use CompoundSynonym.csv
 - convert to hdf5
 - use pyfilesystem for preprocessing
 - filter against config file with compounds of interest
-- allow passing compound_id, food_id, etc
 
-
-Content.csv seems to have food_id in (554, 678) which are missing from Food.csv
-repro:
-- step through foods_by_compound('L-Ascorbic acid')
-- compare df to merged
 
 look up health effects of garlic and compare with
 this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)
