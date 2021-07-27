@@ -63,7 +63,7 @@ https://foodb.ca/compounds/FDB003717#references
 - convert to hdf5
 - use pyfilesystem for preprocessing
 - filter against config file with compounds of interest
-
+- check compound list for capital greek letters
 
 look up health effects of garlic and compare with
 this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)

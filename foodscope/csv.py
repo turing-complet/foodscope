@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from foodscope.mappings import expand_greeks
+
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
@@ -37,7 +39,8 @@ class Table(pd.DataFrame):
         super().__init__(df)
 
     def select(self, name):
-        return self.equiv([name])
+        matches = expand_greeks(name)
+        return self.equiv(matches)
 
     def equiv(self, group):
         return self.loc[self.name.str.contains("|".join(group), case=False)]
