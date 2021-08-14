@@ -22,6 +22,66 @@ class FooDb:
             self._content = Content()
         return self._content
 
+    def foods_by_compound(self, compound: str):
+        compounds = self.compound.select(compound)
+        ids = compounds.compound_id
+        df = filter_content(source_type="Compound")
+        mask = df["source_id"].isin(ids)
+        df = df.loc[mask, :]
+        df.rename(columns={"source_id": "compound_id"}, inplace=True)
+
+        merged = pd.merge(df, self.food, on="food_id")
+        return pd.merge(merged, compounds, on="compound_id")
+
+    def health_effects(self, food: str):
+        df = filter_content(source_type="Compound")
+        result = pd.merge(self.food.select(food), df, on="food_id")
+        result = pd.merge(
+            result, self.compound, left_on="source_id", right_on="compound_id"
+        )
+        result = pd.merge(result, self.compounds_health_effect, on="compound_id")
+        return pd.merge(result, self.health_effect, on="health_effect_id")
+
+    def composition(self, food: str, source=None):
+        if source is None:
+            source = ("Compound", "Nutrient")
+
+        df = Content(cols=["source_id", "source_type", "food_id"])
+        df = pd.merge(df, self.food.select(food), on="food_id")
+        result = pd.DataFrame()
+        if "Compound" in source:
+            result = result.append(
+                pd.merge(
+                    filter_content(df, "Compound"),
+                    self.compound,
+                    left_on="source_id",
+                    right_on="compound_id",
+                )
+            )
+        if "Nutrient" in source:
+            result = result.append(
+                pd.merge(
+                    filter_content(df, "Nutrient"),
+                    self.nutrient,
+                    left_on="source_id",
+                    right_on="nutrient_id",
+                )
+            )
+        return result
+
+
+def foods_by_compound(compound: str):
+    return FooDb().foods_by_compound(compound)
+
+
+def health_effects(food: str):
+    return FooDb().health_effects(food)
+
+
+# probably need outer join if source is both
+def composition(food: str, source=None):
+    return FooDb().composition(food, source)
+
 
 class Table(pd.DataFrame):
     _filename = None
@@ -111,54 +171,3 @@ def filter_content(df=None, source_type=None, cols=None):
     if source_type not in ("Nutrient", "Compound"):
         raise ValueError(f"Invalid source_type={source_type}")
     return df.loc[df.source_type == source_type, :]
-
-
-def foods_by_compound(compound: str):
-    compounds = Compound().select(compound)
-    ids = compounds.compound_id
-
-    df = filter_content(source_type="Compound")
-    mask = df["source_id"].isin(ids)
-    df = df.loc[mask, :]
-    df.rename(columns={"source_id": "compound_id"}, inplace=True)
-
-    merged = pd.merge(df, Food(), on="food_id")
-    return pd.merge(merged, compounds, on="compound_id")
-
-
-# probably need outer join if source is both
-def composition(food: str, source=None):
-    if source is None:
-        source = ("Compound", "Nutrient")
-
-    df = Content(cols=["source_id", "source_type", "food_id"])
-    df = pd.merge(df, Food().select(food), on="food_id")
-    result = pd.DataFrame()
-    if "Compound" in source:
-        result = result.append(
-            pd.merge(
-                filter_content(df, "Compound"),
-                Compound(),
-                left_on="source_id",
-                right_on="compound_id",
-            )
-        )
-    if "Nutrient" in source:
-        result = result.append(
-            pd.merge(
-                filter_content(df, "Nutrient"),
-                Nutrient(),
-                left_on="source_id",
-                right_on="nutrient_id",
-            )
-        )
-    return result
-
-
-# reuse the part from Compound
-def health_effects(food: str):
-    df = filter_content(source_type="Compound")
-    result = pd.merge(Food().select(food), df, on="food_id")
-    result = pd.merge(result, Compound(), left_on="source_id", right_on="compound_id")
-    result = pd.merge(result, CompoundsHealthEffect(), on="compound_id")
-    return pd.merge(result, HealthEffect(), on="health_effect_id")
