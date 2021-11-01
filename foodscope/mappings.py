@@ -1,15 +1,28 @@
-alpha = "α"
-beta = "β"
-gamma = "γ"
-delta = "δ"
-epsilon = "ε"
-
 greek = {
-    "alpha": alpha,
-    "beta": beta,
-    "gamma": gamma,
-    "delta": delta,
-    "epsilon": epsilon,
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "omicron": "ο",
+    "pi": "π",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
 }
 
 
@@ -30,7 +43,5 @@ def expand_greeks(word, delimiter="-"):
 
     return [delimiter.join(r) for r in result]
 
-
-# TODO: map "alpha" to alpha and use in search automatically
 
 vitamin_a = ["Retinol"] + expand_greeks("beta-Carotene")

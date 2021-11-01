@@ -14,6 +14,14 @@ Usage (see [demo](foodscope/demo.py))
 ```python
 import foodscope as fs
 
+
+# global view
+db = fs.FooDb()
+db.food.select("milk")
+
+# case insensitive match across permutations
+db.compound.equiv(fs.expand_greeks("beta-carotene"))
+
 # base data frames
 food = fs.Food()
 compound = fs.Compound()
@@ -35,21 +43,27 @@ fs.health_effects("artichoke")
 c = fs.Compound()
 c.equiv(fs.vitamin_a)
 c.health_effects(fs.vitamin_a)
+
+# misc
+fs.expand_greeks("beta-Carotene")
 ```
 
 https://foodb.ca/compounds/FDB003717#references
 
 ## TODO
-- Gluten free, dairy free, low beta carotene, low vitamin A, low sulfur
 - Bin foods by nutrient (quartiles)
 - get health effects of a given meal
 - preprocess data to minimize file size, or import to postgres?
-- cache base data frames in memory
-- unit test with df.head() as mock
-- compounds contain greek β AND regular "beta"
 - fuzzy vs exact match - could use global option?
 - ask foodb about nan cols
 - use CompoundSynonym.csv
 - convert to hdf5
 - filter against config file with compounds of interest
-- allow passing compound_id, food_id, etc
+- check compound list for capital greek letters
+- cache results from complex functions
+- document columns in return values
+- reuse tables already in memory for pd.merge. related: chaining joins between table subclasses?
+- add aliases for other vitamins
+
+look up health effects of garlic and compare with
+this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)
