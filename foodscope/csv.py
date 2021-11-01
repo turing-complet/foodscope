@@ -1,9 +1,11 @@
+import logging
 from pathlib import Path
 
 import pandas as pd
 
 from foodscope.mappings import expand_greeks
 
+_log = logging.getLogger(__name__)
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
@@ -103,6 +105,11 @@ class Table(pd.DataFrame):
         return self.equiv(matches)
 
     def equiv(self, group):
+        if isinstance(group, str):
+            _log.warn("Use .select() instead")
+            group = [group]
+        if not isinstance(group, (list, tuple, set)):
+            raise TypeError("group should be iterable")
         return self.loc[self.name.str.contains("|".join(group), case=False)]
 
 

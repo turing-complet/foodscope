@@ -45,3 +45,4 @@ def expand_greeks(word, delimiter="-"):
 
 
 vitamin_a = ["Retinol"] + expand_greeks("beta-Carotene")
+vitamin_c = ["ascorbic acid"]
