@@ -9,6 +9,18 @@ _log = logging.getLogger(__name__)
 _csv_dir = Path(Path(__file__).parent.parent, "v2020_04_07")
 
 
+def lazy_property(fn):
+    attr = f"_lazy_{fn.__name__}"
+
+    @property
+    def _lazy(self):
+        if not hasattr(self, attr):
+            setattr(self, attr, fn(self))
+        return getattr(self, attr)
+
+    return _lazy
+
+
 class FooDb:
     def __init__(self) -> None:
         self.food = Food()
@@ -18,22 +30,13 @@ class FooDb:
         self.compounds_health_effect = CompoundsHealthEffect()
         self._content = None
 
-    @property
+    @lazy_property
     def content(self):
-        if self._content is None:
-            self._content = Content()
-        return self._content
+        return Content()
 
     def foods_by_compound(self, compound: str):
-        compounds = self.compound.select(compound)
-        ids = compounds.compound_id
-        df = filter_content(source_type="Compound")
-        mask = df["source_id"].isin(ids)
-        df = df.loc[mask, :]
-        df.rename(columns={"source_id": "compound_id"}, inplace=True)
-
-        merged = pd.merge(df, self.food, on="food_id")
-        return pd.merge(merged, compounds, on="compound_id")
+        _log.warn("Use Food.by_compound instead")
+        return self.food.by_compound(compound)
 
     def health_effects(self, food: str):
         df = filter_content(source_type="Compound")
@@ -70,19 +73,6 @@ class FooDb:
                 )
             )
         return result
-
-
-def foods_by_compound(compound: str):
-    return FooDb().foods_by_compound(compound)
-
-
-def health_effects(food: str):
-    return FooDb().health_effects(food)
-
-
-# probably need outer join if source is both
-def composition(food: str, source=None):
-    return FooDb().composition(food, source)
 
 
 class Table(pd.DataFrame):
@@ -143,6 +133,25 @@ class Food(EntityTable):
     _rename = {"id": "food_id"}
     _id = "food_id"
 
+    def by_compound(self, name):
+        compounds = DB.compound.select(name)
+        ids = compounds.compound_id
+        df = filter_content(DB.content, source_type="Compound")
+        mask = df["source_id"].isin(ids)
+        df = df.loc[mask, :]
+        df.rename(columns={"source_id": "compound_id"}, inplace=True)
+
+        merged = pd.merge(df, self, on="food_id")
+        return pd.merge(merged, compounds, on="compound_id")
+
+    def subtract(self, name):
+        compounds = DB.compound.select(name)
+        ids = compounds.compound_id
+        df = filter_content(DB.content, source_type="Compound")
+        mask = df["source_id"].isin(ids)
+        filtered_ids = df.loc[~mask, :].food_id
+        return self.loc[self.food_id.isin(filtered_ids)]
+
 
 class HealthEffect(EntityTable):
     _filename = "HealthEffect.csv"
@@ -178,3 +187,19 @@ def filter_content(df=None, source_type=None, cols=None):
     if source_type not in ("Nutrient", "Compound"):
         raise ValueError(f"Invalid source_type={source_type}")
     return df.loc[df.source_type == source_type, :]
+
+
+def foods_by_compound(compound: str):
+    return DB.foods_by_compound(compound)
+
+
+def health_effects(food: str):
+    return DB.health_effects(food)
+
+
+# probably need outer join if source is both
+def composition(food: str, source=None):
+    return DB.composition(food, source)
+
+
+DB = FooDb()

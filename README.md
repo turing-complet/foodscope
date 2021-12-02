@@ -62,7 +62,6 @@ https://foodb.ca/compounds/FDB003717#references
 - check compound list for capital greek letters
 - cache results from complex functions
 - document columns in return values
-- reuse tables already in memory for pd.merge. related: chaining joins between table subclasses?
 - add aliases for other vitamins
 
 look up health effects of garlic and compare with
