@@ -42,10 +42,10 @@ class FooDb:
         df = filter_content(source_type="Compound")
         result = pd.merge(self.food.select(food), df, on="food_id")
         result = pd.merge(
-            result, self.compound, left_on="source_id", right_on="compound_id"
+            result, self.compound.df, left_on="source_id", right_on="compound_id"
         )
-        result = pd.merge(result, self.compounds_health_effect, on="compound_id")
-        return pd.merge(result, self.health_effect, on="health_effect_id")
+        result = pd.merge(result, self.compounds_health_effect.df, on="compound_id")
+        return pd.merge(result, self.health_effect.df, on="health_effect_id")
 
     def composition(self, food: str, source=None):
         if source is None:
@@ -58,7 +58,7 @@ class FooDb:
             result = result.append(
                 pd.merge(
                     filter_content(df, "Compound"),
-                    self.compound,
+                    self.compound.df,
                     left_on="source_id",
                     right_on="compound_id",
                 )
@@ -67,7 +67,7 @@ class FooDb:
             result = result.append(
                 pd.merge(
                     filter_content(df, "Nutrient"),
-                    self.nutrient,
+                    self.nutrient.df,
                     left_on="source_id",
                     right_on="nutrient_id",
                 )
@@ -75,7 +75,7 @@ class FooDb:
         return result
 
 
-class Table(pd.DataFrame):
+class Table:
     _filename = None
     _cols = None
     _rename = None
@@ -85,10 +85,9 @@ class Table(pd.DataFrame):
             cols = self._cols
         elif cols == "all":
             cols = None
-        df = load(self._filename, cols)
+        self.df: pd.DataFrame = load(self._filename, cols)
         if self._rename is not None:
-            df.rename(columns=self._rename, inplace=True)
-        super().__init__(df)
+            self.df.rename(columns=self._rename, inplace=True)
 
     def select(self, name):
         matches = expand_greeks(name)
@@ -100,12 +99,13 @@ class Table(pd.DataFrame):
             group = [group]
         if not isinstance(group, (list, tuple, set)):
             raise TypeError("group should be iterable")
-        return self.loc[self.name.str.contains("|".join(group), case=False)]
+        return self.df.loc[self.df.name.str.contains("|".join(group), case=False)]
 
 
 class EntityTable(Table):
+    _id = None
     def by_id(self, row_id):
-        return self.loc[self.get(self._id) == row_id, :]
+        return self.df.loc[self.df.get(self._id) == row_id, :]
 
 
 class Nutrient(EntityTable):
@@ -123,8 +123,8 @@ class Compound(EntityTable):
 
     def health_effects(self, group):
         result = self.equiv(group)
-        result = pd.merge(result, CompoundsHealthEffect(), on="compound_id")
-        return pd.merge(result, HealthEffect(), on="health_effect_id")
+        result = pd.merge(result, CompoundsHealthEffect().df, on="compound_id")
+        return pd.merge(result, HealthEffect().df, on="health_effect_id")
 
 
 class Food(EntityTable):
@@ -136,21 +136,26 @@ class Food(EntityTable):
     def by_compound(self, name):
         compounds = DB.compound.select(name)
         ids = compounds.compound_id
-        df = filter_content(DB.content, source_type="Compound")
+        df = filter_content(DB.content.df, source_type="Compound")
         mask = df["source_id"].isin(ids)
         df = df.loc[mask, :]
         df.rename(columns={"source_id": "compound_id"}, inplace=True)
 
-        merged = pd.merge(df, self, on="food_id")
+        merged = pd.merge(df, self.df, on="food_id")
         return pd.merge(merged, compounds, on="compound_id")
 
     def subtract(self, name):
         compounds = DB.compound.select(name)
         ids = compounds.compound_id
-        df = filter_content(DB.content, source_type="Compound")
+        df = filter_content(DB.content.df, source_type="Compound")
         mask = df["source_id"].isin(ids)
-        filtered_ids = df.loc[~mask, :].food_id
-        return self.loc[self.food_id.isin(filtered_ids)]
+        filtered_ids = df.loc[~mask, :].food_id.unique()
+
+        orig = set(self.df.name)
+        self.df = self.df.loc[self.df.food_id.isin(filtered_ids)]
+        new = set(self.df.name)
+        print(f"Removed = {orig-new}")
+        return self
 
 
 class HealthEffect(EntityTable):
@@ -183,7 +188,7 @@ def load(filename, cols=None):
 
 
 def filter_content(df=None, source_type=None, cols=None):
-    df = Content(cols) if df is None else df
+    df = Content(cols).df if df is None else df
     if source_type not in ("Nutrient", "Compound"):
         raise ValueError(f"Invalid source_type={source_type}")
     return df.loc[df.source_type == source_type, :]
