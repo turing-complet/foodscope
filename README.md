@@ -14,22 +14,25 @@ Usage (see [demo](foodscope/demo.py))
 ```python
 import foodscope as fs
 
-
 # global view
 db = fs.FooDb()
 db.food.select("milk")
 
 # case insensitive match across permutations
-db.compound.equiv(fs.expand_greeks("beta-carotene"))
+db.compound.select(fs.expand_greeks("beta-carotene"))
+
+# automatically expand
+db.compound.select("beta-carotene")
 
 # base data frames
+nutrient = fs.Nutrient()
 food = fs.Food()
 compound = fs.Compound()
 
 # unfiltered
 nutrient = fs.Nutrient(cols="all")
 
-#simple filters
+# simple filters
 food.select("chicken")
 nutrient.select("protein")
 fs.filter_content(source_type="Nutrient")
@@ -41,11 +44,8 @@ fs.health_effects("artichoke")
 
 # compounds
 c = fs.Compound()
-c.equiv(fs.vitamin_a)
+c.select(fs.vitamin_a)
 c.health_effects(fs.vitamin_a)
-
-# misc
-fs.expand_greeks("beta-Carotene")
 ```
 
 https://foodb.ca/compounds/FDB003717#references
@@ -63,6 +63,7 @@ https://foodb.ca/compounds/FDB003717#references
 - cache results from complex functions
 - document columns in return values
 - add aliases for other vitamins
+- define nice repr to print underlying df
 
 look up health effects of garlic and compare with
 this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)

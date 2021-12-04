@@ -5,7 +5,10 @@ db = fs.FooDb()
 db.food.select("milk")
 
 # case insensitive match across permutations
-db.compound.equiv(fs.expand_greeks("beta-carotene"))
+db.compound.select(fs.expand_greeks("beta-carotene"))
+
+# automatically expand
+db.compound.select("beta-carotene")
 
 # base data frames
 nutrient = fs.Nutrient()
@@ -27,5 +30,5 @@ fs.health_effects("artichoke")
 
 # compounds
 c = fs.Compound()
-c.equiv(fs.vitamin_a)
+c.select(fs.vitamin_a)
 c.health_effects(fs.vitamin_a)

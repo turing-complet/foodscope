@@ -14,7 +14,7 @@ cols["food"] = _cols(df)
 
 
 # case insensitive match across permutations
-df = db.compound.equiv(fs.expand_greeks("beta-carotene"))
+df = db.compound.select(fs.expand_greeks("beta-carotene"))
 cols["compound"] = _cols(df)
 
 
@@ -42,7 +42,7 @@ cols["health_effects"] = _cols(df)
 
 # compounds
 c = fs.Compound()
-c.equiv(fs.vitamin_a)
+c.select(fs.vitamin_a)
 df = c.health_effects(fs.vitamin_a)
 cols["compound_health_effects"] = _cols(df)
 

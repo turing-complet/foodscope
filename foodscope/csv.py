@@ -90,16 +90,12 @@ class Table:
             self.df.rename(columns=self._rename, inplace=True)
 
     def select(self, name):
-        matches = expand_greeks(name)
-        return self.equiv(matches)
-
-    def equiv(self, group):
-        if isinstance(group, str):
-            _log.warn("Use .select() instead")
-            group = [group]
-        if not isinstance(group, (list, tuple, set)):
+        if isinstance(name, str):
+            _log.info("Expanding greeks")
+            name = expand_greeks(name)
+        if not isinstance(name, (list, tuple, set)):
             raise TypeError("group should be iterable")
-        return self.df.loc[self.df.name.str.contains("|".join(group), case=False)]
+        return self.df.loc[self.df.name.str.contains("|".join(name), case=False)]
 
 
 class EntityTable(Table):
@@ -122,7 +118,7 @@ class Compound(EntityTable):
     _id = "compound_id"
 
     def health_effects(self, group):
-        result = self.equiv(group)
+        result = self.select(group)
         result = pd.merge(result, CompoundsHealthEffect().df, on="compound_id")
         return pd.merge(result, HealthEffect().df, on="health_effect_id")
 
@@ -149,12 +145,12 @@ class Food(EntityTable):
         ids = compounds.compound_id
         df = filter_content(DB.content.df, source_type="Compound")
         mask = df["source_id"].isin(ids)
-        filtered_ids = df.loc[~mask, :].food_id.unique()
+        filtered_ids = df.loc[mask, :].food_id.unique()
 
         orig = set(self.df.name)
-        self.df = self.df.loc[self.df.food_id.isin(filtered_ids)]
+        self.df = self.df.loc[~self.df.food_id.isin(filtered_ids)]
         new = set(self.df.name)
-        print(f"Removed = {orig-new}")
+        print(f"Removed = {sorted(orig-new)}")
         return self
 
 
