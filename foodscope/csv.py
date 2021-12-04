@@ -51,7 +51,7 @@ class FooDb:
         if source is None:
             source = ("Compound", "Nutrient")
 
-        df = Content(cols=["source_id", "source_type", "food_id"])
+        df = Content(cols=["source_id", "source_type", "food_id"]).df
         df = pd.merge(df, self.food.select(food), on="food_id")
         result = pd.DataFrame()
         if "Compound" in source:

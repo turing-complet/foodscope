@@ -61,7 +61,6 @@ https://foodb.ca/compounds/FDB003717#references
 - filter against config file with compounds of interest
 - check compound list for capital greek letters
 - cache results from complex functions
-- document columns in return values
 - add aliases for other vitamins
 
 look up health effects of garlic and compare with

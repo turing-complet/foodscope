@@ -4,46 +4,40 @@ cols = {}
 
 
 def _cols(df):
-    return list(df.columns.values)
+    return list(df.columns)
 
 
-# global view
-db = fs.FooDb()
-df = db.food.select("milk")
+df = fs.Food(cols="all").df
 cols["food"] = _cols(df)
 
-
-# case insensitive match across permutations
-df = db.compound.select(fs.expand_greeks("beta-carotene"))
+df = fs.Compound(cols="all").df
 cols["compound"] = _cols(df)
 
 
-# base data frames
-nutrient = fs.Nutrient()
-food = fs.Food()
-compound = fs.Compound()
-
-# unfiltered
-nutrient = fs.Nutrient(cols="all")
+df = fs.Nutrient(cols="all").df
 cols["nutrient"] = _cols(df)
 
+df = fs.HealthEffect(cols="all").df
+cols["health_effect"] = _cols(df)
 
-# simple filters
-food.select("chicken")
-nutrient.select("protein")
-df = fs.filter_content(source_type="Nutrient")
+df = fs.CompoundsHealthEffect(cols="all").df
+cols["compounds_health_effect"] = _cols(df)
+
+df = fs.Content(cols="all").df
 cols["content_by_nutrient"] = _cols(df)
 
 # fancy stuff
-fs.foods_by_compound("sulf")
-fs.composition("apple")
-df = fs.health_effects("artichoke")
-cols["health_effects"] = _cols(df)
+df = fs.foods_by_compound("sulf")
+cols["foods_by_compound"] = _cols(df)
 
-# compounds
-c = fs.Compound()
-c.select(fs.vitamin_a)
-df = c.health_effects(fs.vitamin_a)
-cols["compound_health_effects"] = _cols(df)
+df = fs.composition("apple")
+cols["fs.composition"] = _cols(df)
+
+df = fs.health_effects("artichoke")
+cols["fs.health_effects"] = _cols(df)
+
+
+df = fs.Compound().health_effects(fs.vitamin_a)
+cols["compound.health_effects"] = _cols(df)
 
 print(cols)
