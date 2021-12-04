@@ -63,7 +63,6 @@ https://foodb.ca/compounds/FDB003717#references
 - cache results from complex functions
 - document columns in return values
 - add aliases for other vitamins
-- define nice repr to print underlying df
 
 look up health effects of garlic and compare with
 this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)

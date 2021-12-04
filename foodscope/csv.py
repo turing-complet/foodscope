@@ -89,6 +89,9 @@ class Table:
         if self._rename is not None:
             self.df.rename(columns=self._rename, inplace=True)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(shape={self.df.shape}, cols={list(self.df.columns)})"
+
     def select(self, name):
         if isinstance(name, str):
             _log.info("Expanding greeks")
@@ -100,6 +103,7 @@ class Table:
 
 class EntityTable(Table):
     _id = None
+
     def by_id(self, row_id):
         return self.df.loc[self.df.get(self._id) == row_id, :]
 
