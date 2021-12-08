@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 import pandas as pd
+import numexpr
 
 from foodscope.mappings import expand_greeks
 
@@ -57,7 +58,7 @@ class FooDb:
         if "Compound" in source:
             result = result.append(
                 pd.merge(
-                    filter_content(df, "Compound"),
+                    filter_content(df, source_type="Compound"),
                     self.compound.df,
                     left_on="source_id",
                     right_on="compound_id",
@@ -66,7 +67,7 @@ class FooDb:
         if "Nutrient" in source:
             result = result.append(
                 pd.merge(
-                    filter_content(df, "Nutrient"),
+                    filter_content(df, source_type="Nutrient"),
                     self.nutrient.df,
                     left_on="source_id",
                     right_on="nutrient_id",
@@ -144,10 +145,10 @@ class Food(EntityTable):
         merged = pd.merge(df, self.df, on="food_id")
         return pd.merge(merged, compounds, on="compound_id")
 
-    def subtract(self, name):
+    def subtract(self, name, threshold=None):
         compounds = DB.compound.select(name)
         ids = compounds.compound_id
-        df = filter_content(DB.content.df, source_type="Compound")
+        df = filter_content(DB.content.df, source_type="Compound", floor=threshold)
         mask = df["source_id"].isin(ids)
         filtered_ids = df.loc[mask, :].food_id.unique()
 
@@ -187,11 +188,17 @@ def load(filename, cols=None):
     return pd.read_csv(Path(_csv_dir, filename), usecols=cols)
 
 
-def filter_content(df=None, source_type=None, cols=None):
+def filter_content(df=None, source_type=None, cols=None, floor=None):
     df = Content(cols).df if df is None else df
     if source_type not in ("Nutrient", "Compound"):
         raise ValueError(f"Invalid source_type={source_type}")
-    return df.loc[df.source_type == source_type, :]
+    query = "source_type == @source_type"
+    if floor is not None:
+        query += " & (orig_content > @floor"
+        query += " | orig_min > @floor"
+        query += " | orig_max > @floor)"
+        query += " & @pd.notna([orig_content, orig_min, orig_max]).any()"
+    return df.query(query, engine="python")
 
 
 def foods_by_compound(compound: str):

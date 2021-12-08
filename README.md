@@ -62,6 +62,7 @@ https://foodb.ca/compounds/FDB003717#references
 - check compound list for capital greek letters
 - cache results from complex functions
 - add aliases for other vitamins
+- untangle circular references
 
 look up health effects of garlic and compare with
 this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4417560/)
