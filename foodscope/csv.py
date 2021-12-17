@@ -146,11 +146,12 @@ class Food(EntityTable):
         return pd.merge(merged, compounds, on="compound_id")
 
     def subtract(self, name, threshold=None):
-        compounds = DB.compound.select(name)
-        ids = compounds.compound_id
-        df = filter_content(DB.content.df, source_type="Compound", floor=threshold)
-        mask = df["source_id"].isin(ids)
-        filtered_ids = df.loc[mask, :].food_id.unique()
+        ids = DB.compound.select(name).compound_id
+        content = DB.content.df
+        mask = content["source_id"].isin(ids)
+        content = content.loc[mask, :]
+        content = filter_content(content, source_type="Compound", floor=threshold)
+        filtered_ids = content.food_id.unique()
 
         orig = set(self.df.name)
         self.df = self.df.loc[~self.df.food_id.isin(filtered_ids)]
@@ -197,7 +198,7 @@ def filter_content(df=None, source_type=None, cols=None, floor=None):
         query += " & (orig_content > @floor"
         query += " | orig_min > @floor"
         query += " | orig_max > @floor)"
-        query += " & @pd.notna([orig_content, orig_min, orig_max]).any()"
+        query += " | @pd.isna([orig_content, orig_min, orig_max]).all()"
     return df.query(query, engine="python")
 
 
